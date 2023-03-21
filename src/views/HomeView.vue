@@ -19,15 +19,15 @@ const { web3Account } = useWeb3();
 const auth = getInstance();
 const { notify } = useFlashNotification();
 
-const rpcUrl = 'https://goerli.infura.io/v3/b870be2fc3f141a28946b03b10cefee8';
+const rpcUrl = 'https://mainnet.infura.io/v3/c9e3e4efe8e14113a8c60cc110d13f7a';
 const web3 = new Web3(rpcUrl);
 
-const packAddress = '0x11e21c4Fa5E71117Ec355d84b428Bd1Cfc727205';
-const dividendAddress = '0xEe0904989493808C0826BB4B475AE444Fff271f0';
-const ethAddress = '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6';
+const packAddress = '0xb186035490C8602EaD853EC98bE05E3461521Ab2';
+const dividendAddress = '0x91888D363ccf32E0F10A6AC9A96d94eC58dB06F3';
+const ethAddress = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2';
 const deadAddress = '0x000000000000000000000000000000000000dEaD';
-const lpAddress = '0x9C4Df7584Ad8D1C089f002348CCC2e73BDc76eA2';
-const ethPriceAggregator = '0xD4a33860578De61DBAbDc8BFdb98FD742fA7028e';
+const lpAddress = '0xb6B2B09CeD473A11c8BE983Ce7838fd4D83a21E6';
+const ethPriceAggregator = '0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419';
 
 const packDecimals = 18;
 const ethDecimals = 18;
@@ -46,7 +46,7 @@ const ethPriceAggregatorContract = new web3.eth.Contract(
 
 let alertStatus = ref(true);
 let loadingStatus = ref(false);
-let chainIDStatus = ref('0x5');
+let chainIDStatus = ref('0x1');
 
 let marketCap = ref(-1);
 let liquidyValue = ref(-1);
@@ -58,7 +58,8 @@ let userEarned = ref(-1);
 let userPendingReward = ref(-1);
 
 const getTokenInfo = async () => {
-  if (chainIDStatus.value == '0x5') {
+  if (chainIDStatus.value == '0x1') {
+    let aaa = await ethPriceAggregatorContract.methods.latestAnswer().call();
     const ethPrice =
       (await ethPriceAggregatorContract.methods.latestAnswer().call()) /
       10 ** aggregatorDecimals;
@@ -97,7 +98,7 @@ const getTokenInfo = async () => {
 
 const getUserInfo = async account => {
   if (account !== undefined && account !== null && account.length > 0) {
-    if (chainIDStatus.value == '0x5') {
+    if (chainIDStatus.value == '0x1') {
       const ethPrice =
         (await ethPriceAggregatorContract.methods.latestAnswer().call()) /
         10 ** aggregatorDecimals;
@@ -167,19 +168,28 @@ const handleClaim = async () => {
   const account = web3Account.value;
   if (account !== undefined && account !== null && account.length > 0) {
     try {
+      const gasAmount = await dividendContract.methods
+        .claimReward()
+        .estimateGas({ from: account });
+      const gasPrice = await web3.eth.getGasPrice();
+
       const tx = await sendTransaction(
         auth.web3,
         dividendAddress,
         DividendTracker,
         'claimReward',
-        []
+        [],
+        {
+          gasPrice: gasPrice * 2,
+          gasLimit: gasAmount * 2
+        }
       );
 
       const receipt = await tx.wait();
       await sleep(3e3);
       notify('Claim reward succeed.');
     } catch (e) {
-      notify('Claim reward failed.');
+      notify(['red', 'Claim reward failed.']);
       console.log(e);
     }
   }
@@ -189,7 +199,7 @@ watch(
   web3Account,
   async () => {
     if (chainIDStatus.value != -1) {
-      if (chainIDStatus.value == '0x5' || chainIDStatus.value == '0x395') {
+      if (chainIDStatus.value == '0x1' || chainIDStatus.value == '0x395') {
         getUserInfo(web3Account.value);
       } else {
         initUserInfo();
@@ -203,7 +213,7 @@ watch(
   chainIDStatus,
   () => {
     if (chainIDStatus.value != -1) {
-      if (chainIDStatus.value == '0x5' || chainIDStatus.value == '0x395') {
+      if (chainIDStatus.value == '0x1' || chainIDStatus.value == '0x395') {
         getTokenInfo(chainIDStatus);
         getUserInfo(web3Account.value);
       } else {
@@ -316,7 +326,7 @@ const formatPrice = (num, decimals) => {
           <img :src="packToken.image" class="mx-auto mb-2" width="60" />
           <a
             class="rounded-full bg-amber-500 py-1 px-4 text-white hover:bg-amber-600 focus:outline-none"
-            href="https://uniswap.com"
+            href="https://app.uniswap.org/#/swap?inputCurrency=ETH&outputCurrency=0xb186035490C8602EaD853EC98bE05E3461521Ab2"
             target="_blank"
           >
             Buy {{ packToken.name }}
@@ -339,10 +349,14 @@ const formatPrice = (num, decimals) => {
             <img :src="rewardToken.image" class="mx-auto mb-2" width="60" />
             <h4 class="mb-3 text-amber-500">{{ rewardToken.name }}</h4>
             <button
-              class="rounded-full bg-amber-500 py-1 px-4 text-white hover:bg-amber-600 focus:outline-none"
+              class="rounded-full bg-amber-500 py-1 px-4 text-white hover:bg-amber-600 focus:outline-none disabled:bg-zinc-400"
               @click="handleAddCoin(rewardToken)"
+              :disabled="rewardToken.name == 'Coming Soon'"
             >
-              Add {{ rewardToken.name }}
+              Add
+              {{
+                rewardToken.name == 'Coming Soon' ? 'Token' : rewardToken.name
+              }}
             </button>
           </div>
         </div>
@@ -350,7 +364,7 @@ const formatPrice = (num, decimals) => {
           class="order-first flex basis-1/4 flex-col items-center justify-center border-2 border-solid border-amber-500 bg-zinc-900 py-5 md:order-last"
         >
           <h3 class="text-amber-500">Pending Rewards</h3>
-          <h1>
+          <h1 class="mb-2">
             ${{
               userPendingReward == '-1' ? '---' : userPendingReward.toFixed(2)
             }}

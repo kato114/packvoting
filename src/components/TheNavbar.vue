@@ -38,7 +38,7 @@ const { web3Account } = useWeb3();
             Dashboard
           </router-link>
           <router-link
-            :to="{ path: '/packtoken.eth' }"
+            :to="{ path: '/pack-leader.eth' }"
             class="ml-3 hidden items-center sm:block"
             style="font-size: 16px"
           >

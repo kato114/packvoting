@@ -11,7 +11,7 @@ let loadingStatus = ref(false);
 
 const networkList = {
   Ethereum: {
-    chainId: '0x5',
+    chainId: '0x1',
     name: 'Ethereum',
     nativeCurrency: {
       name: 'Ethereum',
@@ -100,7 +100,7 @@ watch(
   async () => {
     if (window.ethereum) {
       const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-      if (chainId == '0x5') selectedNetwork.value = 'Ethereum';
+      if (chainId == '0x1') selectedNetwork.value = 'Ethereum';
       else if (chainId == '0x395') selectedNetwork.value = 'Shibarium';
       else selectedNetwork.value = 'Wrong';
     }

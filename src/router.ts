@@ -50,7 +50,7 @@ const spaceRoutes = [
         to.params.step = 0;
       }
     }
-  },
+  }
 
   // {
   //   path: 'about',
@@ -74,7 +74,7 @@ const profileRoutes = [
     path: '',
     name: 'profileActivity',
     component: ProfileActivity
-  },
+  }
   // {
   //   path: 'about/',
   //   name: 'profileAbout',

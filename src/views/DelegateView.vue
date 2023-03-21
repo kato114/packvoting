@@ -42,7 +42,7 @@ const specifySpaceChecked = ref(true);
 const space = ref({});
 const form = ref({
   address: route.params.to || '',
-  id: 'packtoken.eth'
+  id: 'pack-leader.eth'
 });
 
 const { profiles, loadProfiles } = useProfiles();
