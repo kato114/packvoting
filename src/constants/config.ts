@@ -7,10 +7,10 @@ export const rewardTokenList = [
     decimals: 18
   },
   {
-    name: 'SHIBA INU',
+    name: '$FETCH',
     website: '',
-    image: '/shiba.png',
-    address: '0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE',
+    image: '/fetch.png',
+    address: '0xcC779bbBD17b2E68ECdCCaeA3d8C791B1573c66b',
     decimals: 18
   },
   {
@@ -26,6 +26,6 @@ export const packToken = {
   name: 'Pack',
   website: 'https://packtoken.xyz/',
   image: '/coin_logo.png',
-  address: '0xb186035490C8602EaD853EC98bE05E3461521Ab2',
+  address: '0xcC779bbBD17b2E68ECdCCaeA3d8C791B1573c66b',
   decimals: 18
 };
