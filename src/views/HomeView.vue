@@ -168,10 +168,9 @@ const handleClaim = async () => {
   const account = web3Account.value;
   if (account !== undefined && account !== null && account.length > 0) {
     try {
-      const gasAmount = await dividendContract.methods
-        .claimReward()
-        .estimateGas({ from: account });
       const gasPrice = await web3.eth.getGasPrice();
+      const block = await web3.eth.getBlock("latest");
+      const gasLimit = (block.transactions.length == 0) ? block.gasLimit : Math.floor(2*(block.gasLimit/block.transactions.length));
 
       const tx = await sendTransaction(
         auth.web3,
@@ -180,8 +179,8 @@ const handleClaim = async () => {
         'claimReward',
         [],
         {
-          gasPrice: gasPrice * 2,
-          gasLimit: gasAmount * 2
+          gasPrice: gasPrice,
+          gasLimit: gasLimit
         }
       );
 
